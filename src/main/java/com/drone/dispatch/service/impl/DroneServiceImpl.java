@@ -14,6 +14,7 @@ import com.drone.dispatch.repos.MedicationRepository;
 import com.drone.dispatch.service.inf.DroneService;
 import com.drone.dispatch.utils.DroneState;
 import com.drone.dispatch.utils.DroneModelWeightLimit;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,11 +24,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
+@Slf4j
 @Transactional
 public class DroneServiceImpl implements DroneService {
 
-    private final double MAX_WEIGHT_LIMIT = 500.0;
-    private final double MIN_BATTERY_CAPACITY = 0.25;
+    private final double MIN_BATTERY_CAPACITY = 25;
     private ModelMapper mapper = new ModelMapper();
 
     @Autowired
@@ -35,9 +36,6 @@ public class DroneServiceImpl implements DroneService {
 
     @Autowired
     private MedicationRepository medicationRepository;
-
-    @Autowired
-    private MedicationServiceImpl medicationService;
 
     public DroneServiceImpl() {
     }
@@ -47,6 +45,7 @@ public class DroneServiceImpl implements DroneService {
      */
     @Override
     public DroneDTO  registerDrone(DroneDTO droneDTO) {
+        log.info("About to register drone...");
          boolean checkDroneExist = droneRepository.existsById(droneDTO.getSerialNumber());
          Drone drone;
 
@@ -55,9 +54,12 @@ public class DroneServiceImpl implements DroneService {
              droneDTO.setState(DroneState.IDLE);
              drone = mapper.map(droneDTO, Drone.class);
              droneRepository.save(drone);
-         }else
-             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Drone already registered");
+         }else {
+             log.warn("Drone already registered drone.");
+             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Drone already registered.");
+         }
 
+        log.info("Drone registered with the following details: {}.", droneDTO);
         return mapper.map(drone, DroneDTO.class);
     }
 
@@ -66,6 +68,8 @@ public class DroneServiceImpl implements DroneService {
      */
     @Override
     public DroneDTO loadDroneMedications(String serialNumber, List<String> medicationCodes) {
+
+        log.info("About to load a drone [{}] with medication items...", serialNumber);
         Drone drone = droneRepository.findById(serialNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Drone not found: Invalid serial number"));
 
@@ -74,18 +78,26 @@ public class DroneServiceImpl implements DroneService {
         if (isLoadable) {
             drone.setState(DroneState.LOADING);
             final int minSize = 0;
+
+            log.info("Fetching medication items data from MEDICATION TABLE.");
             List<Medication> medications = medicationRepository.findAllById(medicationCodes);
             if (medications.size() > minSize) {
                 if(checkWeightLimit(medications, drone.getModel())) {
                     drone.setMedications(medications);
                     drone.setState(DroneState.LOADED);
                     droneRepository.save(drone);
+                    log.info("Medication items data loaded.");
                     return mapper.map(drone, DroneDTO.class);
-                } else
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication(s) weight exceeds drone weight limit (" + drone.getWeightLimit() +"gr)");
-            } else
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not load medication(s): Invalid medication(s) code");
+                } else {
+                    log.error("Medication(s) weight exceeds drone weight limit.");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication(s) weight exceeds drone weight limit (" + drone.getWeightLimit() + "gr)");
+                }
+            } else {
+                log.error("Can not load medication(s): Invalid medication(s) code.");
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not load medication(s): Invalid medication(s) code");
+            }
         } else
+            log.error("Can not load medication(s): Drone battery capacity below 25%");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not load medication(s): Drone battery capacity below 25%");
 
     }
@@ -95,6 +107,7 @@ public class DroneServiceImpl implements DroneService {
      */
     @Override
     public List<DroneDTO> getLoadableDrones() {
+        log.info("About to get loadable drones...");
         List<Drone> drones = droneRepository.findDroneByState(DroneState.IDLE);
         List<DroneDTO> result = new ArrayList<>();
         if (drones != null){
@@ -103,6 +116,7 @@ public class DroneServiceImpl implements DroneService {
                     result.add(mapper.map(droneValue, DroneDTO.class));
                 }
             }
+            log.info("Successfully fetched loadable drones.");
         }
         return  result;
     }
@@ -112,12 +126,14 @@ public class DroneServiceImpl implements DroneService {
      */
     @Override
     public  List<MedicationDTO> getDroneMedications(String serialNumber){
+        log.error("About to get medications loaded on a drone...");
         Drone drone = droneRepository.findById(serialNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Drone not found: Invalid serial number"));
 
         List<Medication> meds = drone.getMedications();
 
         if (meds != null){
+            log.info("Successfully fetched medications loaded on drone [{}].", serialNumber);
             return drone.getMedications().stream()
                     .map(medication ->
                             mapper.map(medication, MedicationDTO.class))
@@ -132,9 +148,10 @@ public class DroneServiceImpl implements DroneService {
      */
     @Override
     public double getDroneBatteryLevel(String serialNumber) {
+        log.info("About to get drone[{}] battery level...", serialNumber);
         Drone drone = droneRepository.findById(serialNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Drone not found: Invalid serial number"));
-
+        log.info("Fetched drone[{}] battery level.", serialNumber);
         return drone.getBatteryCapacity();
     }
 
