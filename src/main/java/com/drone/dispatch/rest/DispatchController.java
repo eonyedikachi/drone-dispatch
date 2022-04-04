@@ -19,12 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class DispatchController {
 
     @Autowired
-    private DroneServiceImpl droneServiceImpl;
-
-    @Autowired
-    private MedicationServiceImpl medicationService;
-
-    @Autowired
     private DroneService droneService;
 
     public DispatchController() {
