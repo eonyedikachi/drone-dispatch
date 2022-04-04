@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum DroneUtil {
+public enum DroneModelWeightLimit {
 
     LIGHT_WEIGHT("Lightweight",200.0),
     MIDDLE_WEIGHT("Middleweight",300.0),
@@ -18,11 +18,11 @@ public enum DroneUtil {
     private double weightLimit;
 
     public static double getWeightLimit(String model) {
-        for (DroneUtil b : DroneUtil.values()) {
+        for (DroneModelWeightLimit b : DroneModelWeightLimit.values()) {
             if (String.valueOf(b.model).equals(model)) {
                 return b.weightLimit;
             }
         }
-        return HEAVY_WEIGHT.weightLimit;
+        return LIGHT_WEIGHT.weightLimit;
     }
 }
