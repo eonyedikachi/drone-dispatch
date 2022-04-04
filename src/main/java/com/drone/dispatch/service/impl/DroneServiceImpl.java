@@ -90,7 +90,8 @@ public class DroneServiceImpl implements DroneService {
                     return mapper.map(drone, DroneDTO.class);
                 } else {
                     log.error("Medication(s) weight exceeds drone weight limit.");
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication(s) weight exceeds drone weight limit (" + drone.getWeightLimit() + "gr)");
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication(s) weight exceeds drone weight limit ("
+                            + DroneModelWeightLimit.getWeightLimit(drone.getModel()) + "gr)");
                 }
             } else {
                 log.error("Can not load medication(s): Invalid medication(s) code.");
