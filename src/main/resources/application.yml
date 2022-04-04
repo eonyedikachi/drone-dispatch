@@ -1,13 +1,17 @@
 spring:
   datasource:
-    url: ${JDBC_DATABASE_URL:jdbc:h2:mem:drone-dispatch}
+    url: ${JDBC_DATABASE_URL:jdbc:h2:mem:testdb}
     username: ${JDBC_DATABASE_USERNAME:sa}
     password: ${JDBC_DATABASE_PASSWORD:}
+    driverClassName: org.h2.Driver
+  h2:
+    console.enabled: true
   dbcp2:
     max-wait-millis: 30000
     validation-query: SELECT 1
     validation-query-timeout: 30
   jpa:
+    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
     open-in-view: false
@@ -19,4 +23,4 @@ spring:
         id:
           new_generator_mappings: true
 springdoc:
-  pathsToMatch: /api/**
+  pathsToMatch: /rest/**
