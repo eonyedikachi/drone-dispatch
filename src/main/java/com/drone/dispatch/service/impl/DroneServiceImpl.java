@@ -1,4 +1,4 @@
-package com.drone.dispatch.service;
+package com.drone.dispatch.service.impl;
 
 import com.drone.dispatch.entities.Drone;
 import com.drone.dispatch.pojos.DroneDTO;
@@ -13,12 +13,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
-public class DroneService {
+public class DroneServiceImpl {
+
+    private final double MAX_WEIGHT_LIMIT = 500.0;
 
     @Autowired
     private DroneRepository droneRepository;
 
-    public DroneService() {
+    public DroneServiceImpl() {
     }
 
     public List<DroneDTO> findAll() {
@@ -34,7 +36,8 @@ public class DroneService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    public String create(final DroneDTO droneDTO) {
+    public String registerDrone(DroneDTO droneDTO) {
+
         final Drone drone = new Drone();
         mapToEntity(droneDTO, drone);
         return droneRepository.save(drone).getSerialNumber();
@@ -54,7 +57,7 @@ public class DroneService {
     private DroneDTO mapToDTO(final Drone drone, final DroneDTO droneDTO) {
         droneDTO.setSerialNumber(drone.getSerialNumber());
         droneDTO.setModel(drone.getModel());
-        droneDTO.setWeight(drone.getWeight());
+        droneDTO.setWeightLimit(drone.getWeightLimit());
         droneDTO.setBatteryCapacity(drone.getBatteryCapacity());
         droneDTO.setState(drone.getState());
         return droneDTO;
@@ -63,7 +66,7 @@ public class DroneService {
     private Drone mapToEntity(final DroneDTO droneDTO, final Drone drone) {
         drone.setSerialNumber(droneDTO.getSerialNumber());
         drone.setModel(droneDTO.getModel());
-        drone.setWeight(droneDTO.getWeight());
+        drone.setWeightLimit(droneDTO.getWeightLimit());
         drone.setBatteryCapacity(droneDTO.getBatteryCapacity());
         drone.setState(droneDTO.getState());
         return drone;

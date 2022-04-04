@@ -1,9 +1,10 @@
-package com.drone.dispatch.service;
+package com.drone.dispatch.service.impl;
 
 import com.drone.dispatch.entities.Medication;
 import com.drone.dispatch.pojos.MedicationDTO;
 import com.drone.dispatch.repos.MedicationRepository;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +14,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 @Service
-public class MedicationService {
+public class MedicationServiceImpl {
 
     @Autowired
     private MedicationRepository medicationRepository;
 
-    public MedicationService() {
+    private static final Pattern NAME_PATTERN = Pattern.compile("^[\\w-]+$");
+    private static final Pattern CODE_PATTERN = Pattern.compile("[A-Z][_][0-9]");
+
+    public MedicationServiceImpl() {
 
     }
 
@@ -50,6 +54,14 @@ public class MedicationService {
 
     public void delete(final String code) {
         medicationRepository.deleteById(code);
+    }
+
+    private boolean isValidName(String name){
+        return NAME_PATTERN.matcher(name).matches();
+    }
+
+    private boolean isValidCode(String code){
+        return CODE_PATTERN.matcher(code).matches();
     }
 
     private MedicationDTO mapToDTO(final Medication medication, final MedicationDTO medicationDTO) {

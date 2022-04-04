@@ -1,11 +1,11 @@
 package com.drone.dispatch.entities;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 
 @Entity
 @Getter
@@ -24,5 +24,8 @@ public class Medication {
 
     @Column
     private String image;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy = "medications")
+    private List<Drone> drones;
 
 }
