@@ -17,4 +17,12 @@ public enum DroneUtil {
     private String model;
     private double weightLimit;
 
+    public static double getWeightLimit(String model) {
+        for (DroneUtil b : DroneUtil.values()) {
+            if (String.valueOf(b.model).equals(model)) {
+                return b.weightLimit;
+            }
+        }
+        return HEAVY_WEIGHT.weightLimit;
+    }
 }
