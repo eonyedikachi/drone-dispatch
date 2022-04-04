@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import com.drone.dispatch.repos.MedicationRepository;
 import com.drone.dispatch.service.inf.DroneService;
 import com.drone.dispatch.utils.DroneState;
-import com.drone.dispatch.utils.DroneUtil;
+import com.drone.dispatch.utils.DroneModelWeightLimit;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,8 @@ public class DroneServiceImpl implements DroneService {
          Drone drone;
 
          if(!checkDroneExist){
-             droneDTO.setWeightLimit(DroneUtil.getWeightLimit(droneDTO.getModel()));
+             droneDTO.setWeightLimit(DroneModelWeightLimit.getWeightLimit(droneDTO.getModel()));
+             droneDTO.setState(DroneState.IDLE);
              drone = mapper.map(droneDTO, Drone.class);
              droneRepository.save(drone);
          }else
@@ -68,14 +69,25 @@ public class DroneServiceImpl implements DroneService {
         Drone drone = droneRepository.findById(serialNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Drone not found: Invalid serial number"));
 
-        final int minSize = 0;
-        List<Medication> meds = medicationRepository.findAllById(medicationCodes);
-        if (meds.size() > minSize) {
-            drone.setMedications(meds);
-            droneRepository.save(drone);
-        }
+        boolean isLoadable = checkLoadable(drone.getBatteryCapacity());
 
-        return mapper.map(drone, DroneDTO.class);
+        if (isLoadable) {
+            drone.setState(DroneState.LOADING);
+            final int minSize = 0;
+            List<Medication> medications = medicationRepository.findAllById(medicationCodes);
+            if (medications.size() > minSize) {
+                if(checkWeightLimit(medications, drone.getModel())) {
+                    drone.setMedications(medications);
+                    drone.setState(DroneState.LOADED);
+                    droneRepository.save(drone);
+                    return mapper.map(drone, DroneDTO.class);
+                } else
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Medication(s) weight exceeds drone weight limit (" + drone.getWeightLimit() +"gr)");
+            } else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Can not load medication(s): Invalid medication(s) code");
+        } else
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can not load medication(s): Drone battery capacity below 25%");
+
     }
 
     /**
@@ -150,6 +162,20 @@ public class DroneServiceImpl implements DroneService {
 
     public void delete(final String serialNumber) {
         droneRepository.deleteById(serialNumber);
+    }
+
+    private boolean checkWeightLimit(List<Medication> medications, String model){
+
+        double medsWeight = 0.0;
+        for (Medication medication : medications) {
+            medsWeight += medication.getWeight();
+        }
+
+     return DroneModelWeightLimit.getWeightLimit(model) >= medsWeight;
+    }
+
+    private boolean checkLoadable(double batteryCapacity){
+        return batteryCapacity > MIN_BATTERY_CAPACITY;
     }
 
 }
