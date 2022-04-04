@@ -1,7 +1,7 @@
 package com.drone.dispatch.pojos;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,17 +11,16 @@ import lombok.Setter;
 public class MedicationDTO {
 
     @NotNull
-    @Size(max = 255)
+    @Pattern(regexp = "^[A-Z0-9_]*$")
     private String code;
 
     @NotNull
-    @Size(max = 255)
+    @Pattern(regexp = "^[\\w-]+$")
     private String name;
 
     @NotNull
     private Double weight;
 
-    @Size(max = 255)
     private String image;
 
 }
