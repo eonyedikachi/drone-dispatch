@@ -11,6 +11,7 @@ spring:
     validation-query: SELECT 1
     validation-query-timeout: 30
   jpa:
+    defer-datasource-initialization: true
     spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update
