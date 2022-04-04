@@ -21,7 +21,7 @@ public class BatteryLevelChecker {
     //    @Scheduled(cron = "[Seconds] [Minutes] [Hours] [Day of month] [Month] [Day of week] [Year]")
     @Scheduled(cron = "00 05 * * * ?")
     public void batteryLevelChecker(){
-        log.info("Checking all drones' battery level");
+        log.info("Checking all drones battery level");
         List<DroneDTO> drones = droneService.getAllDrones();
 
         if (drones != null){
