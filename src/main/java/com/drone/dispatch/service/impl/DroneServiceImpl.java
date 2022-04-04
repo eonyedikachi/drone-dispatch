@@ -96,14 +96,15 @@ public class DroneServiceImpl implements DroneService {
     @Override
     public List<DroneDTO> getLoadableDrones() {
         List<Drone> drones = droneRepository.findDroneByState(DroneState.IDLE);
-
+        List<DroneDTO> result = new ArrayList<>();
         if (drones != null){
-            return drones.stream().map(drone ->
-                    mapper.map(drone, DroneDTO.class))
-                    .collect(Collectors.toList());
+            for (Drone droneValue: drones) {
+                if (checkLoadable(droneValue.getBatteryCapacity())) {
+                    result.add(mapper.map(droneValue, DroneDTO.class));
+                }
+            }
         }
-
-        return  new ArrayList<>();
+        return  result;
     }
 
     /**
