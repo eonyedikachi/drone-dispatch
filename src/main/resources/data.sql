@@ -6,7 +6,7 @@ VALUES
     ('0d02ccbb-328e-41a4-830b-c261d51cce2a', 90.0, 'Heavyweight', 'IDLE', 500.0),
     ('7ee45eb4-e170-4052-8540-fad51e4b8ba7', 65.0, 'Cruiserweight', 'IDLE', 400.0);
 
-INSERT INTO MEDICATION (CODE, NAME, WEIGHT)
+INSERT INTO MEDICATION (NAME, CODE, WEIGHT)
 VALUES
     ('6aa89d53-72dc-4f90-bea5-6c4a7d90f2a0', 'CLARTEM_QS23',  50.0),
     ('14d7b017-ae4f-4c75-92e4-ac086b9813f4','CLARTEM_TX45', 60.0),
