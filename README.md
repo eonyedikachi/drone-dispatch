@@ -1,15 +1,12 @@
-[[_TOC_]]
 
 ---
-
-:scroll: **START**
 # Drone Dispatch Application
 
 ## About
 * REST API service that allows Drone dispatch medications.
 ---
+[[_TOC_]]
 ## Table of contents
->
 >* [Title](#drone-dispatch-application)
 >* [About](#about)
 >* [Table of contents](#table-of-contents)
@@ -99,4 +96,3 @@ java -jar drone-dispatch-0.0.1-SNAPSHOT.jar
 }
 ```
 ---
-:scroll: **END** 
