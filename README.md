@@ -22,7 +22,7 @@
 >    * [Get battery level for a given drone](#get-battery-level-for-a-given-drone)
 >
 ---
-#Requirements
+# Requirements
 * Java 11 SDK or newer.
 * Maven 3.6 or newer.
 ---
@@ -44,7 +44,7 @@ java -jar drone-dispatch-0.0.1-SNAPSHOT.jar
 ```
 ---
 # APIs
-##Register a drone:
+## Register a drone:
 - Url: `http://localhost:8080/rest/drone
 - Request type: POST
 - Request body Sample
@@ -58,7 +58,7 @@ java -jar drone-dispatch-0.0.1-SNAPSHOT.jar
 }
 ```
 
-##Load a drone with medication items:
+## Load a drone with medication items:
 - Url: `http://localhost:8080/rest/drone/medications
 - Request type: PUT
 - Request Parameters Sample
@@ -70,7 +70,7 @@ java -jar drone-dispatch-0.0.1-SNAPSHOT.jar
     VALUE3 : 6aa89d53-72dc-4f90-bea5-6c4a7d90f2a0, 14d7b017-ae4f-4c75-92e4-ac086b9813f4
 
 ```
-##Get loaded medication items for a given drone:
+## Get loaded medication items for a given drone:
 - Url: `http://localhost:8080/rest/drone/medications
 - Request type: GET
 - Request Parameter Sample
@@ -80,12 +80,12 @@ java -jar drone-dispatch-0.0.1-SNAPSHOT.jar
     VALUE: 350315e9-d90f-43f0-8226-5e5de0cced3f
 }
 ```
-##Get drones available for loading:
+## Get drones available for loading:
 - Url: `http://localhost:8080/rest/drones
 - Request type: GET
 
 
-##Get battery level for a given drone:
+## Get battery level for a given drone:
 - Url: `http://localhost:8080/rest/drone/battery
 - Request type: GET
 - Request Parameter Sample
